@@ -24,17 +24,22 @@ class _HomePageState extends State<HomePage> {
   //init state is called when the app is opened
   @override
   void initState() {
-    
-    //if this is the first time ever opening the app, then create default data
-    if (_myBox.get("TODOLIST") == null) {
+    super.initState();
+
+    try {
+      //if this is the first time ever opening the app, then create default data
+      if (_myBox.get("TODOLIST") == null) {
+        db.createInitialData();
+        db.updateDataBase();
+      } else {
+        //there already exists data, so load it
+        db.loadData();
+      }
+    } catch (e) {
+      // If there's an error loading data, create initial data
       db.createInitialData();
       db.updateDataBase();
-    } else {
-      //there already exists data, so load it
-      db.loadData();
     }
-
-    super.initState();
   }
 
   //this code is for the checkbox and the list of todos
@@ -45,36 +50,34 @@ class _HomePageState extends State<HomePage> {
   // ];
   //checkbox was tapped/?
   void checkboxchanged(bool? value, int index) {
-    setState(() {
-      //toggle the value of the checkbox
-      db.todoList[index][1] = !db.todoList[index][1];
-    });
-    //update the database when a checkbox is toggled
-    db.updateDataBase();
+    if (value != null) {
+      setState(() {
+        //set the value of the checkbox
+        db.todoList[index][1] = value;
+      });
+      //update the database when a checkbox is toggled
+      db.updateDataBase();
+    }
   }
   // save new todo method
   void saveNewTodo() {
+    //get the text from the text field
+    final newTodo = _controller.text.trim();
+    //check if the text is empty
+    if (newTodo.isEmpty) {
+      return;
+    }
+
+    //add the new todo to the list
     setState(() {
       //the new todo is added to the list with the value of false (not completed)
-      db.todoList.add([_controller, false]);
-      _controller.clear();
+      db.todoList.add([newTodo, false]);
     });
+
+    _controller.clear();
     Navigator.of(context).pop();
-    db.updateDataBase();
-  
-
-
-    //get the text from the text field
-    // final newTodo = _controller.text.trim();
-    // //check if the text is empty
-    // if (newTodo.isEmpty) {
-    // //   return;
-    // }
-    //add the new todo to the list
-    
-    
     //update the database when a new todo is added
-    
+    db.updateDataBase(); 
   }
   //calling the method createNewTodo to add new todos to the list
   void createNewTodo() {

@@ -2,10 +2,10 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 class TodoDataBase {
   //list of todos
- List todoList = [];
+  List todoList = [];
   //reference the hive box
   // ignore: unused_field
-  final _myBox = Hive.box('mybox');
+  Box get _myBox => Hive.box('mybox');
   //create initial data
    void createInitialData() {
     todoList = [
@@ -17,7 +17,7 @@ class TodoDataBase {
 //load the data from the database
 void loadData() {
   //if the database is empty, create initial data
-  todoList = _myBox.get("TODOLIST");
+  todoList = _myBox.get("TODOLIST") ?? [];
 }
 //update the database
 void updateDataBase() {
